@@ -3,9 +3,10 @@ kind: Kustomization
 
 resources:
   - deployment.yaml
+  - service.yaml
 
 configMapGenerator:
-  - name: nginx-html
+  - name: frontend
     files:
       - html/index.html
 

@@ -1,1 +1,1 @@
-k3d cluster delete minimal
+k3d cluster delete mycluster

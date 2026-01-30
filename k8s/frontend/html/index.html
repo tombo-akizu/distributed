@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Async fetch example</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; }
+    button { padding: 10px 14px; margin-right: 8px; }
+    pre { background: #f6f6f6; padding: 12px; border-radius: 8px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <h1>ボタンでHTTPS通信（非同期）</h1>
+
+  <button id="send">送信</button>
+  <button id="cancel" disabled>キャンセル</button>
+
+  <h2>ログ</h2>
+  <pre id="log"></pre>
+
+  <script>
+    const logEl = document.getElementById("log");
+    const sendBtn = document.getElementById("send");
+    const cancelBtn = document.getElementById("cancel");
+
+    let controller = null; // AbortControllerを保持
+
+    function log(msg) {
+      logEl.textContent += msg + "\n";
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    async function postJson(url, data, signal) {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        signal,
+        // credentials: "include", // Cookie認証なら有効化
+      });
+
+      const contentType = res.headers.get("content-type") || "";
+      const body = contentType.includes("application/json")
+        ? await res.json()
+        : await res.text();
+
+      if (!res.ok) {
+        // サーバ側エラーも分かるように
+        throw new Error(`HTTP ${res.status}: ${typeof body === "string" ? body : JSON.stringify(body)}`);
+      }
+      return body;
+    }
+
+    sendBtn.addEventListener("click", async () => {
+      if (controller) return; // 二重送信防止
+
+      // ✅ ここを「自分が管理しているHTTPSエンドポイント」に変更
+      const url = "http://localhost:8088/api/echo";
+
+      controller = new AbortController();
+      sendBtn.disabled = true;
+      cancelBtn.disabled = false;
+
+      const payload = {
+        message: "hello",
+        timestamp: new Date().toISOString(),
+      };
+
+      log(`[main] 送信開始: ${url}`);
+      try {
+        const result = await postJson(url, payload, controller.signal);
+        log("[main] 成功:");
+        log(typeof result === "string" ? result : JSON.stringify(result, null, 2));
+      } catch (err) {
+        if (err.name === "AbortError") {
+          log("[main] キャンセルされました");
+        } else {
+          log("[main] 失敗: " + String(err));
+          log("  - CORS設定やURL、TLS証明書、サーバ稼働状況を確認してください");
+        }
+      } finally {
+        controller = null;
+        sendBtn.disabled = false;
+        cancelBtn.disabled = true;
+        log("---");
+      }
+    });
+
+    cancelBtn.addEventListener("click", () => {
+      if (!controller) return;
+      controller.abort();
+    });
+  </script>
+</body>
+</html>
+
