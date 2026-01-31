@@ -28,7 +28,3 @@
     k3s version v1.31.5-k3s1 (default)
     ```
 
-## minimum cluster
-commited to github repository
-
-

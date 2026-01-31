@@ -9,7 +9,7 @@ RUN cargo build --release
 RUN rm -rf src
 
 COPY . .
-RUN cargo build --release
+RUN touch src/main.rs && cargo build --release
 
 # ---- runtime stage ----
 FROM debian:bookworm-slim
