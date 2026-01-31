@@ -11,7 +11,7 @@
   </style>
 </head>
 <body>
-  <h1>ボタンでHTTPS通信（非同期）</h1>
+  <h1>Web Client</h1>
 
   <button id="send">送信</button>
   <button id="cancel" disabled>キャンセル</button>
@@ -55,7 +55,6 @@
     sendBtn.addEventListener("click", async () => {
       if (controller) return; // 二重送信防止
 
-      // ✅ 相対URLを使用（HTTP/HTTPS両対応）
       const url = "/api/echo";
 
       controller = new AbortController();
