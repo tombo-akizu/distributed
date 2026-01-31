@@ -55,8 +55,8 @@
     sendBtn.addEventListener("click", async () => {
       if (controller) return; // 二重送信防止
 
-      // ✅ ここを「自分が管理しているHTTPSエンドポイント」に変更
-      const url = "http://localhost:8088/api/echo";
+      // ✅ 相対URLを使用（HTTP/HTTPS両対応）
+      const url = "/api/echo";
 
       controller = new AbortController();
       sendBtn.disabled = true;

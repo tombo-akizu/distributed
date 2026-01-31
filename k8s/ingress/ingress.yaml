@@ -5,6 +5,10 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.middlewares: default-strip-api-prefix@kubernetescrd
 spec:
+  tls:
+    - hosts:
+        - localhost
+      secretName: tls-secret
   rules:
     - host: localhost
       http:
